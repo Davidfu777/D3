@@ -1,0 +1,28 @@
+.group{
+    opacity: 0.3
+}
+rect {
+    opacity: 0.4;
+  }
+  
+  h1,
+  h2 {
+    font-family: cursive;
+  }
+  
+  body {
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    color: #666666;
+  }
+.boarder{
+    fill: none;
+    stroke: red;
+    stroke-width: 10;
+    opacity : 1
+}
+.h2-1 {
+    color: red;
+}
+circle{
+    fill: blueviolet;
+}
