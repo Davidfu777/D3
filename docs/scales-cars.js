@@ -1,5 +1,7 @@
 let margin = {top: 20, right: 10, bottom: 20, left: 10}
-d3.selectAll('svg#cars-scatter')
+let innerheight = 600 - margin.bottom - margin.top
+let innerwidth = 600 - margin.left - margin.right
+let svg = d3.selectAll('svg#cars-scatter')
 .attr('width', 600)
 .attr('height', 400)
 //.style('background-color','blue')
@@ -19,16 +21,15 @@ let cyllist = cars.map(d => d.cyl)
 d3.extent(cyllist)
 console.log(d3.extent(cyllist))
 
-let dispscale =
-d3.scaleLinear()
-.domain([0,500])
-.range([50,550])
-
-
 let mpgscale = 
 d3.scaleLinear()
 .domain([0,40])
-.range([50,350])
+.range([0,innerwidth])
+
+let dispscale =
+d3.scaleLinear()
+.domain([0,500])
+.range([innerheight+50,0])
 
 let wtscale =
 d3.scaleSqrt()
@@ -56,4 +57,11 @@ console.log(dispscale(100))
 
 let xAxis = d3.axisBottom(dispscale)
 let yAxis = d3.axisLeft(mpgscale)
+
+svg.append('g')
+.attr("transform", 'translate(5,'+innerheight+')' )      // This controls the vertical position of the Axis
+.call(xAxis);
+
+svg.append('g')
+.call(yAxis)
 
