@@ -1,67 +1,90 @@
-let margin = {top: 20, right: 10, bottom: 20, left: 10}
-let innerheight = 600 - margin.bottom - margin.top
-let innerwidth = 600 - margin.left - margin.right
-let svg = d3.selectAll('svg#cars-scatter')
-.attr('width', 600)
-.attr('height', 400)
-//.style('background-color','blue')
-let mpglist = cars.map(d => d.mpg)    // or cars.map(d => d["map"])
-d3.extent(mpglist)
-console.log(d3.extent(mpglist))
+  
+let outerWidth = 600
+let outerHeight = 400
+let margins = { top: 30, bottom: 50, left: 50, right: 30 }
+let innerWidth = outerWidth - margins.left - margins.right
+let innerHeight = outerHeight - margins.top - margins.bottom
 
-let displist = cars.map(d => d.disp)
-d3.extent(displist)
-console.log(d3.extent(displist))
+let scatterOuter = d3
+  .select('svg#cars-scatter')
+  .attr('width', outerWidth)
+  .attr('height', outerHeight)
 
-let wtlist = cars.map(d => d.wt)
-d3.extent(wtlist)
-console.log(d3.extent(wtlist))
+let scatterInner = scatterOuter
+  .append('g')
+  .attr('width', innerWidth)
+  .attr('height', innerHeight)
+  .attr('transform', 'translate(' + margins.left + ',' + margins.right + ')')
 
-let cyllist = cars.map(d => d.cyl)
-d3.extent(cyllist)
-console.log(d3.extent(cyllist))
+scatterOuter
+  .append('rect')
+  .attr('width', outerWidth)
+  .attr('height', outerHeight)
+  .attr('fill', 'transparent')
+  .attr('stroke', 'navy')
+  .attr('stroke-width', 2) 
 
-let mpgscale = 
-d3.scaleLinear()
-.domain([0,40])
-.range([0,innerwidth])
+scatterInner.style('fill', 'skyblue')
+.style('opacity', 0.8)
 
-let dispscale =
-d3.scaleLinear()
-.domain([0,500])
-.range([innerheight+50,0])
+scatterInner
+  .append('rect')
+  .attr('width', innerWidth)
+  .attr('height', innerHeight)
+  .attr('fill', 'skyblue')
+  .attr('fill-opacity', 0.2)
 
-let wtscale =
-d3.scaleSqrt()
-.domain([0,6])
-.range([0,10])
+let xScale = d3
+  .scaleLinear()
+  .domain(d3.extent(cars.map(d => d.mpg)))
+  .range([20, innerWidth - 20])
+let xAxis = d3.axisBottom(xScale)
 
-let cylscale = 
-d3.scaleLinear()
-.domain([4,8])
-.range(['green','blue'])
+let yScale = d3
+  .scaleLinear()
+  .domain(d3.extent(cars.map(d => d.wt)))
+  .range([20, innerHeight - 20].reverse())
+let yAxis = d3.axisLeft(yScale).tickSize(-innerWidth)
 
-let carsplot = d3.selectAll('svg#cars-scatter')
-.selectAll('circle')
-.data(cars)
-.enter()
-.append('circle')
-.attr('cx', (d) => dispscale(d.disp))
-.attr('cy', (d) => mpgscale(d.mpg))
-//.attr('cx',50)
-//.attr('cy',50)
-.attr('r', (d) => wtscale(d.wt))
-.style('fill', (d) => cylscale(d.cyl))
-.style('stroke','black')
-console.log(dispscale(100))
+let sizeScale = d3
+  .scaleSqrt()
+  .domain([0, Math.max(...cars.map(d => d.disp))])
+  .range([5, 15])
 
-let xAxis = d3.axisBottom(dispscale)
-let yAxis = d3.axisLeft(mpgscale)
+let colorScale = d3
+  .scaleOrdinal()
+  .domain([4, 6, 8])
+  .range(['red', 'green', 'blue'])
 
-svg.append('g')
-.attr("transform", 'translate(5,'+innerheight+')' )      // This controls the vertical position of the Axis
-.call(xAxis);
+scatterInner
+  .append('g')
+  .attr('transform', 'translate(' + 0 + ', ' + innerHeight + ')')
+  .attr('class', 'x-axis')
+  .call(xAxis)
 
-svg.append('g')
-.call(yAxis)
+scatterInner
+  .append('rect')
+  .attr('width', innerWidth)
+  .attr('height', innerHeight)
+  .attr('fill', 'transparent')
+  .attr('stroke', 'black')
 
+scatterInner
+  .append('g')
+  .attr('class', 'y-axis')
+  .call(yAxis)
+
+scatterInner
+  .selectAll('circle')
+  .data(cars)
+  .enter()
+  .append('circle')
+  .attr('cx', d => xScale(d.mpg))
+  .attr('cy', d => yScale(d.wt))
+  .style('fill', 'transparent')
+  .style('stroke-width', 5)
+  .transition()
+  .duration(2000)
+  .attr('r', d => sizeScale(d.disp))
+  .style('stroke', d => colorScale(d.cyl))
+  .style('opacity', 0.6)
